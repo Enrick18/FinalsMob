@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'app_router.dart';
 import 'app_themes.dart';
+import 'bloc/taskBloc.dart';
+import 'bloc/themeBloc.dart';
+import 'bloc/themeState.dart';
 import 'screens/tabs_screen.dart';
 
 void main() async {
@@ -23,11 +27,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BloC Tasks App',
-      theme: AppThemes.appThemeData[AppTheme.lightMode],
-      home: const TabsScreen(),
-      onGenerateRoute: appRouter.onGenerateRoute,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<TaskBloc>(
+          create: (_) => TaskBloc(),
+        ),
+        BlocProvider<ThemeBloc>(
+          create: (_) => ThemeBloc(),
+        ),
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+        final appTheme =
+        state.isDarkTheme! ? AppTheme.darkMode : AppTheme.lightMode;
+        return MaterialApp(
+          title: 'BloC Tasks App',
+          theme: AppThemes.appThemeData[appTheme],
+          home: const TabsScreen(),
+          onGenerateRoute: appRouter.onGenerateRoute,
+        );
+      }),
     );
   }
 }
