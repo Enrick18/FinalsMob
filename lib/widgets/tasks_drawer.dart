@@ -1,8 +1,13 @@
+import 'package:final_mob/bloc/taskBloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/taskState.dart';
+import '../bloc/themeBloc.dart';
+import '../bloc/themeState.dart';
 import '../screens/recycle_bin_screen.dart';
 import '../screens/tabs_screen.dart';
-import '../test_data.dart';
+
 
 class TasksDrawer extends StatelessWidget {
   const TasksDrawer({Key? key}) : super(key: key);
@@ -29,8 +34,14 @@ class TasksDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.folder_special),
               title: const Text('My Tasks'),
-              trailing: Text(
-                '${TestData.pendingTasks.length} | ${TestData.completedTasks.length}',
+              trailing:BlocBuilder<TaskBloc, TaskState>(
+                builder: (context, state) {
+                  final pendingTasks = state.pendingTasks!;
+                  final completedTasks = state.completedTasks!;
+                  return Text(
+                    '${pendingTasks.length} | ${completedTasks.length}',
+                  );
+                },
               ),
               onTap: () => Navigator.pushReplacementNamed(
                 context,
@@ -41,7 +52,12 @@ class TasksDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.delete),
               title: const Text('Recycle Bin'),
-              trailing: Text('${TestData.removedTasks.length}'),
+              trailing:  BlocBuilder<TaskBloc, TaskState>(
+                builder: (context, state) {
+                  final removedTasks = state.removedTasks!;
+                  return Text('${removedTasks.length}');
+                },
+              ),
               onTap: () => Navigator.pushReplacementNamed(
                 context,
                 RecycleBinScreen.path,
@@ -49,14 +65,17 @@ class TasksDrawer extends StatelessWidget {
             ),
             const Divider(),
             const Expanded(child: SizedBox()),
-            ListTile(
-              leading: Switch(
-                value: TestData.isDarkTheme,
-                onChanged: (newValue) => _switchToDarkTheme(context, newValue),
-              ),
-              title: const Text('Switch to Dark Theme'),
-              onTap: () => _switchToDarkTheme(context, !TestData.isDarkTheme),
-            ),
+            BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+              return ListTile(
+                leading: Switch(
+                  value: state.isDarkTheme!,
+                  onChanged: (newValue) =>
+                      _switchToDarkTheme(context, newValue),
+                ),
+                title: const Text('Switch to Dark Theme'),
+                onTap: () => _switchToDarkTheme(context, !state.isDarkTheme!),
+              );
+            }),
             const SizedBox(height: 10),
           ],
         ),
