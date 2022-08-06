@@ -13,8 +13,7 @@ class TasksDrawer extends StatelessWidget {
   const TasksDrawer({Key? key}) : super(key: key);
 
   _switchToDarkTheme(BuildContext context, bool isDarkTheme) {
-    if (isDarkTheme) {
-    } else {}
+    context.read<ThemeBloc>().add(ToggleTheme(isDarkTheme: isDarkTheme));
   }
 
   @override
